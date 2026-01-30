@@ -9,13 +9,36 @@ const JobDetails = () => {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+
+  useEffect(() => {
+    const checkApplied = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(
+          `http://localhost:5000/api/applications/check/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const data = await res.json();
+        setAlreadyApplied(data.applied);
+      } catch (err) {
+        console.error("Check applied failed", err);
+      }
+    };
+
+    checkApplied();
+  }, [id]);
 
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/jobs/${id}`,
-        );
+        const res = await fetch(`http://localhost:5000/api/jobs/${id}`);
 
         if (!res.ok) {
           throw new Error("Job not found");
@@ -90,20 +113,21 @@ const JobDetails = () => {
 
           <div className="flex flex-wrap gap-4 text-sm mb-6">
             <span>{job.location}</span>
-            <span className={getJobTypeColor(job.jobType)}>
-              {job.jobType}
-            </span>
+            <span className={getJobTypeColor(job.jobType)}>{job.jobType}</span>
             <span>{job.experienceLevel}</span>
-            <span className="text-green-600 font-semibold">
-              {job.salary}
-            </span>
+            <span className="text-green-600 font-semibold">{job.salary}</span>
           </div>
 
           <button
+            disabled={alreadyApplied}
             onClick={() => setShowModal(true)}
-            className="bg-[#13823a] text-white px-8 py-3 rounded-lg font-semibold"
+            className={`px-8 py-3 rounded-lg font-semibold ${
+              alreadyApplied
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#13823a] text-white hover:opacity-90"
+            }`}
           >
-            Apply Now
+            {alreadyApplied ? "Already Applied" : "Apply Now"}
           </button>
         </div>
 
@@ -112,18 +136,14 @@ const JobDetails = () => {
           <h2 className="text-2xl font-bold mb-4">Job Description</h2>
           <p className="mb-6">{job.description}</p>
 
-          <h3 className="text-xl font-semibold mb-3">
-            Responsibilities
-          </h3>
+          <h3 className="text-xl font-semibold mb-3">Responsibilities</h3>
           <ul className="list-disc list-inside space-y-2 mb-6">
             {job.responsibilities.map((r, i) => (
               <li key={i}>{r}</li>
             ))}
           </ul>
 
-          <h3 className="text-xl font-semibold mb-3">
-            Required Skills
-          </h3>
+          <h3 className="text-xl font-semibold mb-3">Required Skills</h3>
           <div className="flex flex-wrap gap-2">
             {job.skills.map((skill, i) => (
               <span

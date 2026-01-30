@@ -11,22 +11,6 @@ const AdminDashboard = () => {
 
 
 
-// const handleStatusChange = async (id, status) => {
-//   await fetch(
-//     `http://localhost:5000/api/applications/admin/${id}/status`,
-//     {
-//       method: "PATCH",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//       body: JSON.stringify({ status }),
-//     }
-//   );
-
-//   fetchApplicants();
-// };
-
 
 
 
@@ -156,9 +140,21 @@ useEffect(() => {
     }
   };
 
-  const handleStatusChange = (applicantId, newStatus) => {
-    updateApplicationStatus(applicantId, newStatus);
-  };
+ const handleStatusChange = async (id, status) => {
+  await fetch(
+    `http://localhost:5000/api/applications/admin/${id}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    }
+  );
+
+  fetchApplicants();
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">

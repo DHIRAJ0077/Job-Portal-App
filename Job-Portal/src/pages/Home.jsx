@@ -8,7 +8,6 @@ const Home = () => {
   const [location, setLocation] = useState("");
   const [jobs, setJobs] = useState([]);
 
-
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -29,6 +28,19 @@ const Home = () => {
     };
     fetchJobs();
   }, []);
+
+  const filteredJobs = jobs.filter((job) => {
+    const matchSearch =
+      searchTerm === "" ||
+      job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.company?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchLocation =
+      location === "" ||
+      job.location?.toLowerCase().includes(location.toLowerCase());
+
+    return matchSearch && matchLocation;
+  });
 
   return (
     <div className="min-h-screen">
@@ -97,7 +109,7 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <JobCard key={job.id} job={job} />
             ))}
           </div>

@@ -104,6 +104,23 @@ router.patch("/admin/:id/status", authMiddleware, async (req, res) => {
 
 
 
+router.get("/check/:jobId", authMiddleware, async (req, res) => {
+  const { jobId } = req.params;
+
+  const existing = await prisma.application.findUnique({
+    where: {
+      userId_jobId: {
+        userId: req.user.id,
+        jobId: Number(jobId),
+      },
+    },
+  });
+
+  res.json({ applied: !!existing });
+});
+
+
+
 
 
 
